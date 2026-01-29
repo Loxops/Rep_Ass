@@ -1,0 +1,146 @@
+---
+title: "Introduction to R Assignment"
+author: "Tyler Winter"
+date: "2026-01-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# 1) R and RStudio Concepts
+
+## Where do you type code?
+
+# in the R panel
+
+## Where is the output of the code?
+
+# in the R console
+
+## Where do plots show up?
+
+# in the plots tab
+
+## What is a global environment?
+
+# where your variables are stored in an R session
+
+## How do you get help for a function through RStudio?
+
+# through the help command help()
+
+## What is an R package?
+
+# piece of coded that is set up to run inside of R enviorment that has functions that add to R's capability 
+
+## What is a function?
+
+# a defined chunk of code that can be recaled to be resused
+
+## How do you find the installed and loaded packages?
+
+# installed.packages() and search()
+
+## What is a working directory, and how do you find it?
+
+# where files will be saved to and what folder on your hard drive R is running out of
+
+## What is a relative file path and how is it different than an absolute file path?
+
+# Relative is where the file is stored in relation to the starting folder of the folder structure where it pertains to the first folder of the project. absolute file path is the location on the disk HDD or cloud based where your data is located and is related to the individual.
+
+
+# 2) Steps to start a new R project connected to GitHub (2 pts)
+
+# 1. create repository on Github
+# 2. create new project . version control. git
+# 3. add the URL to the correct spot and set a local folder > create the project
+# 4. authenticate with GitHub and the new project will open
+# 5. use Git tab to push pull and mange the repository
+
+
+# 3) Data classes (3 pts)
+
+## Vector
+
+#Answer: one dimension set of data all the same
+
+## Dataframe
+
+#Answer: base type of data storage for R 2D but can have different types of data
+
+## Matrix
+
+#Answer: 2D set of data is of same type
+
+
+```
+
+
+```{r}
+
+# 4) R Coding Tasks
+#vector named 'z' 
+z <- 1:200
+
+#print mean and stan dif of z
+
+mean(z)
+sd(z)
+
+#vector zlog
+
+zlog <- z > 30
+
+#dataframe with z 
+
+zdf <- data.frame(z,zlog)
+
+#look at names
+head (zdf)
+
+#change names
+colnames(zdf) <- c("zvec","zlogic")
+
+head(zdf)
+
+#new column for squared value
+
+zdf$zsquared <- zdf$zvec^2
+
+# various subsets of data from zdf with and without the subset() function
+
+zdf_sub_w_sub <- subset(zdf,zsquared>10&zsquared<100)
+
+zdf_sub_no_sub <- zdf[zdf$zsquared>10&zdf$zsquared<100,]
+
+head(zdf_sub_w_sub)
+
+head(zdf_sub_no_sub)
+
+zdf_r26 <- zdf[26,]
+
+head(zdf_r26)
+
+zdf_v180 <- zdf$zsquared[180]
+
+head(zdf_v180)
+```
+```{r}
+#reading a CSV file
+
+read.csv("C:/Auburn/Winter_2026/reproducibility/Week 3/Week 3 data/TipsR.csv")
+
+# treat "." as na
+
+tips <- read.csv("C:/Auburn/Winter_2026/reproducibility/Week 3/Week 3 data/TipsR.csv", na.strings = ".")
+
+#count of missing values
+sum(is.na(tips))
+
+#can use this number to check if it alogns with what the NA values are in the .csv
+
+```
