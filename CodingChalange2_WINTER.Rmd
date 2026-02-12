@@ -1,0 +1,127 @@
+---
+title: "Coding Challenge 2 Intro Data Vis"
+author: "Tyler Winter"
+date: "2026-02-05"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+### 1a. What three elements do you need to produce a ggplot?
+#1. data
+#2. Aesthetic mapping
+#3. At least one geom layer
+
+### 1b. What is a geom?
+#A geom is the drawing layer of a plot.
+
+### 1c. What is a facet?
+#facet splits one plot into multiple panels based on a variable
+
+### 1d. Explain the concept of layering.
+#building a ggplot by adding pieces such as geom, scale, label using + to create one figure
+
+### 1e. Where do you add x and y variables and map different shapes, colors, and other attributes to the data?
+#Inside aes() (either in ggplot() or inside a geom).
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Load packages and the CSV
+
+library(tidyverse)
+library(ggplot2)
+
+setwd("C:/Auburn/Winter_2026/reproducibility/Week 4")
+rawdat <- read_csv("MycotoxinData.csv")
+
+glimpse(rawdat)
+```
+
+```{r setup, include=FALSE}
+# treat "na" as missing so DON becomes numeric
+dat <- read_csv("MycotoxinData.csv", na = c("", "NA", "na"))
+
+# force numeric
+dat <- dat %>%
+  mutate(DON = as.numeric(DON))
+
+ggplot(dat, aes(x = Treatment, y = DON, color = Cultivar)) +
+  geom_boxplot(position = "dodge") +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+```
+
+
+```{r setup, include=FALSE}
+## Question 3 (Bar chart with SE error bars)
+
+ggplot(dat, aes(x = Treatment, y = DON, color = Cultivar, fill = Cultivar)) +
+  stat_summary(fun = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge") +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+```
+
+
+```{r setup, include=FALSE}
+# Boxplot + points
+ggplot(dat, aes(x = Treatment, y = DON, color = Cultivar)) +
+  geom_boxplot(position = "dodge") +
+  geom_point(
+    position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.15),
+    shape = 21,
+    color = "black"
+  ) +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+
+# Bar chart + points
+ggplot(dat, aes(x = Treatment, y = DON, color = Cultivar, fill = Cultivar)) +
+  stat_summary(fun = mean, geom = "bar", position = "dodge") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", position = "dodge", width = 0.2) +
+  geom_point(
+    position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.15),
+    shape = 21,
+    color = "black"
+  ) +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+```
+```{r}
+# Bar chart + points + facet
+ggplot(dat, aes(x = Treatment, y = DON, fill = Cultivar)) +
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2) +
+  geom_point(
+    position = position_jitter(width = 0.15),
+    shape = 21,
+    color = "black"
+  ) +
+  facet_wrap(~Cultivar) +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+```
+```{r}
+# Bar chart + transparent points + facet
+ggplot(dat, aes(x = Treatment, y = DON, fill = Cultivar)) +
+  stat_summary(fun = mean, geom = "bar") +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2) +
+  geom_point(
+    position = position_jitter(width = 0.15),
+    shape = 21,
+    color = "black",
+    alpha = 0.3 ##transparency
+  ) +
+  facet_wrap(~Cultivar) +
+  xlab("") +
+  ylab("DON (ppm)") +
+  theme_classic()
+```
+
