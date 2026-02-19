@@ -1,0 +1,150 @@
+---
+title: "Untitled"
+author: "Tyler Winter"
+date: "2026-02-12"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+
+# load packages
+library(tidyverse)
+library(ggpubr)
+
+# color palette
+cbbPalette <- c(
+  "#000000", "#E69F00", "#56B4E9", "#009E73",
+  "#F0E442", "#0072B2", "#D55E00", "#CC79A7"
+)
+
+# read in data
+myco <- read.csv(file.choose(), na.strings = c("na", "NA", ""))
+
+# treat as categories
+myco$Treatment <- as.factor(myco$Treatment)
+myco$Cultivar  <- as.factor(myco$Cultivar)
+
+```
+
+```{r}
+# cultivar colors
+cult_cols <- c(cbbPalette[[2]], cbbPalette[[3]])
+names(cult_cols) <- c("Ambassador", "Wheaton")
+
+# Q1: DON plot (boxplot + points, facet by cultivar)
+p_don <- ggplot(myco, aes(x = Treatment, y = DON, color = Cultivar)) +
+  geom_boxplot(position = position_dodge(0.85), outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(0.05, dodge.width = 0.85), alpha = 0.6, size = 2) +
+  facet_wrap(~Cultivar) +
+  ylab("DON (ppm)") +
+  xlab("") +
+  scale_color_manual(values = cult_cols, name = "") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_don
+```
+
+```{r}
+# Q2: set factor order
+myco$Treatment_ordered <- factor(
+  myco$Treatment,
+  levels = c("NTC", "Fg", "Fg + 37", "Fg + 40", "Fg + 70")
+)
+
+# quick check
+str(myco)
+levels(myco$Treatment)
+levels(myco$Cultivar)
+
+# cultivar colors
+cult_cols <- c(cbbPalette[[2]], cbbPalette[[3]])
+names(cult_cols) <- c("Ambassador", "Wheaton")
+
+```
+
+```{r}
+# Q3: 15ADON plot 
+p_15adon <- ggplot(myco, aes(x = Treatment_ordered, y = X15ADON, color = Cultivar)) +
+  geom_boxplot(position = position_dodge(0.85), outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(0.05, dodge.width = 0.85), alpha = 0.6, size = 2) +
+  facet_wrap(~Cultivar) +
+  ylab("15ADON") +
+  xlab("") +
+  scale_color_manual(values = cult_cols, name = "") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_15adon
+```
+
+```{r}
+# Q3: Seed mass plot
+p_seedmass <- ggplot(myco, aes(x = Treatment_ordered, y = MassperSeed_mg, color = Cultivar)) +
+  geom_boxplot(position = position_dodge(0.85), outlier.shape = NA) +
+  geom_point(position = position_jitterdodge(0.05, dodge.width = 0.85), alpha = 0.6, size = 2) +
+  facet_wrap(~Cultivar) +
+  ylab("Seed Mass (mg)") +
+  xlab("") +
+  scale_color_manual(values = cult_cols, name = "") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_seedmass
+```
+
+```{r}
+# Q4: combine three plots
+p_abc <- ggarrange(
+  p_don, p_15adon, p_seedmass,
+  ncol = 3, nrow = 1,          #Layout
+  labels = c("A", "B", "C"),   #subplot labels
+  common.legend = TRUE,        #shared legend
+  legend = "bottom"
+)
+
+p_abc
+
+```
+
+```{r}
+# Q5: add t-test pairwise comparisons (DON) 
+# steps below (compare cultivars then t test, then pp-values)
+p_don_pwc <- p_don +
+  geom_pwc(aes(group = Cultivar), method = "t_test", label = "p.adj.format", hide.ns = TRUE, step.increase = 0.06)
+
+p_don_pwc
+```
+
+```{r}
+# Q5: add t-test pairwise comparisons (15ADON)
+p_15adon_pwc <- p_15adon +
+  geom_pwc(aes(group = Cultivar), method = "t_test", label = "p.adj.format", hide.ns = TRUE, step.increase = 0.06)
+
+p_15adon_pwc
+```
+
+```{r}
+# Q5: add t-test pairwise comparisons (Seed Mass)
+p_seedmass_pwc <- p_seedmass +
+  geom_pwc(aes(group = Cultivar), method = "t_test", label = "p.adj.format", hide.ns = TRUE, step.increase = 0.06)
+
+p_seedmass_pwc
+
+```
+
+
+```{r}
+# Q5: combine updated plots
+p_abc_pwc <- ggarrange(
+  p_don_pwc, p_15adon_pwc, p_seedmass_pwc,
+  ncol = 3, nrow = 1,
+  labels = c("A", "B", "C"),
+  common.legend = TRUE,
+  legend = "bottom"
+)
+
+p_abc_pwc
+
+```
